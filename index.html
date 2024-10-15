@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>RFID Logger</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        #rfidInput { width: 300px; padding: 10px; font-size: 16px; }
+        #log { margin-top: 20px; max-height: 300px; overflow-y: auto; }
+        #saveButton, #clearButton { margin-top: 20px; padding: 10px 20px; font-size: 16px; }
+        .log-entry { border-bottom: 1px solid #ccc; padding: 5px 0; }
+    </style>
+</head>
+<body>
+    <h1>RFID Logger</h1>
+    <input type="text" id="rfidInput" placeholder="Scan RFID here" autofocus />
+    <div id="log"></div>
+    <button id="saveButton">Save Log to File</button>
+    <!--button id="clearButton">Clear Log</!--button--->
+
+    <script src="script.js"></script>
+</body>
+</html>
