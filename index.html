@@ -37,6 +37,7 @@
         const greetingDiv = document.getElementById('greeting');
         const themeToggleButton = document.getElementById('themeToggleButton');
         let rfidLog = JSON.parse(localStorage.getItem('rfidLog')) || [];
+        let unmaskedLog = JSON.parse(localStorage.getItem('unmaskedLog')) || []; // Array for unmasked log entries
         let validRFIDs = {}; // Object to store valid RFIDs and associated names
 
         // Ensure the input field is always focused
@@ -77,15 +78,25 @@
         }
 
         // Function to add log entry to the display and store in memory
-        function addLogEntry(entryText) {
+        function addLogEntry(rfidCode, isRegistered) {
+            const timestamp = formatTimestamp(new Date());
+            const maskedRFID = maskRFID(rfidCode);
+
+            // Display masked entry
+            const entryText = `${timestamp} ${maskedRFID} - ${isRegistered ? validRFIDs[rfidCode] : 'Not Registered'}`;
             const entry = document.createElement('div');
             entry.className = 'log-entry';
             entry.textContent = entryText;
-            logDiv.prepend(entry); // Add new entries to the top
+            logDiv.prepend(entry);
 
-            // Store the entry in the log array
+            // Store masked entry in rfidLog
             rfidLog.push(entryText);
             localStorage.setItem('rfidLog', JSON.stringify(rfidLog));
+
+            // Store unmasked entry for saving
+            const unmaskedEntry = `${timestamp} ${rfidCode} - ${isRegistered ? validRFIDs[rfidCode] : 'Not Registered'}`;
+            unmaskedLog.push(unmaskedEntry);
+            localStorage.setItem('unmaskedLog', JSON.stringify(unmaskedLog));
         }
 
         // Function to update the static greeting message
@@ -107,18 +118,14 @@
             const rfidCode = rfidInput.value.trim();
 
             if (rfidCode) {
-                const timestamp = formatTimestamp(new Date());
-                const maskedRFID = maskRFID(rfidCode);
+                const isRegistered = validRFIDs[rfidCode] ? true : false;
 
-                // Check if RFID matches a valid entry
-                if (validRFIDs[rfidCode]) {
-                    const entryText = `${timestamp} ${maskedRFID} - ${validRFIDs[rfidCode]}`;
-                    addLogEntry(entryText);
-                    updateGreeting(validRFIDs[rfidCode], true); // Green greeting for registered
+                addLogEntry(rfidCode, isRegistered);
+
+                if (isRegistered) {
+                    updateGreeting(validRFIDs[rfidCode], true);
                 } else {
-                    const entryText = `${timestamp} ${maskedRFID} - Not Registered`;
-                    addLogEntry(entryText);
-                    updateGreeting("Guest", false); // Red greeting for unregistered
+                    updateGreeting("Guest", false);
                 }
 
                 rfidInput.value = ''; // Clear the input field
@@ -140,13 +147,13 @@
         document.addEventListener('click', maintainFocus); // Refocus on textbox if clicked on page
 
         saveButton.addEventListener('click', function() {
-            if (rfidLog.length === 0) {
+            if (unmaskedLog.length === 0) {
                 alert('No entries to save.');
                 return;
             }
 
-            // Prepare data to save
-            const data = rfidLog.join('\n');
+            // Prepare data to save (unmasked entries)
+            const data = unmaskedLog.join('\n');
 
             // Generate default file name
             const now = new Date();
