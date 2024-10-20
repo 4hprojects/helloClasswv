@@ -47,7 +47,7 @@
 
         // Load valid RFIDs from RFIDList.txt
         function loadValidRFIDs() {
-            fetch('https://raw.githubusercontent.com/username/repo-name/branch-name/data/RFIDList.txt')
+            fetch('https://raw.githubusercontent.com/4hprojects/helloClasswv/refs/heads/main/data/RFIDList.txt')
                 .then(response => response.text())
                 .then(data => {
                     const lines = data.split('\n');
